@@ -1,0 +1,20 @@
+pipeline_name: spring-petclinic-auto-pipeline
+environment: production
+target: aws_ec2
+instance_type: t2.micro
+ami: latest-ubuntu
+deploy_using: spring-boot
+labels: [ai-generated, demo, spring-boot, petclinic]
+email_notification: true
+email_recipient: demo@example.com
+version_file: pom.xml
+frontend_port: 8080
+backend_port: 8080
+frontend_framework: thymeleaf
+backend_framework: spring-boot
+test_command_frontend: ./mvnw test
+test_command_backend: ./mvnw test
+lint_command_frontend: ./mvnw checkstyle:check
+lint_command_backend: ./mvnw checkstyle:check
+build_command_frontend: ./mvnw clean package
+build_command_backend: ./mvnw clean package
