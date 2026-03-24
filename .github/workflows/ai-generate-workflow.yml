@@ -1,0 +1,83 @@
+name: AI Pipeline Analyzer
+'on':
+  pull_request:
+    types:
+    - opened
+    - synchronize
+    - reopened
+    - closed
+    branches:
+    - main
+  workflow_dispatch: {}
+jobs:
+  analyze-and-comment:
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+    - name: Checkout PR branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install dependencies
+      run: pip install pyyaml requests
+    - name: Run AI analyzer
+      env:
+        OPENAI_API_TOKEN: ${{ secrets.OPENAI_API_TOKEN }}
+      run: python ai_devops_agent.py --analyze-only --verbose > analysis_output.txt
+        2>&1 || true
+    - name: Generate suggestions report
+      run: python ai_devops_agent.py --suggest-changes || true
+    - name: Post analysis comment on PR
+      env:
+        GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+      run: gh pr comment ${{ github.event.pull_request.number }} --body-file suggestions.md
+        || true
+  create-fix-pr:
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged ==
+      true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+    - name: Checkout main branch
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT_TOKEN }}
+        ref: main
+        fetch-depth: 0
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install dependencies
+      run: pip install pyyaml requests
+    - name: Run AI generator on merged code
+      env:
+        OPENAI_API_TOKEN: ${{ secrets.OPENAI_API_TOKEN }}
+      run: python ai_devops_agent.py
+    - name: Generate suggestions
+      run: python ai_devops_agent.py --suggest-changes
+    - name: Check for suggested changes
+      id: check_changes
+      run: "git add -A\nif git diff --cached --quiet; then\n  echo \"has_changes=false\"\
+        \ >> $GITHUB_OUTPUT\nelse\n  echo \"has_changes=true\" >> $GITHUB_OUTPUT\n\
+        fi\n"
+    - name: Create suggestion branch and PR
+      if: steps.check_changes.outputs.has_changes == 'true'
+      env:
+        GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+      run: "BRANCH=\"ai-suggestions-$(date +%Y%m%d-%H%M%S)\"\ngit config user.name\
+        \ \"github-actions[bot]\"\ngit config user.email \"github-actions[bot]@users.noreply.github.com\"\
+        \ngit checkout -b \"$BRANCH\"\ngit commit -m \"AI: Post-merge pipeline updates\"\
+        \ngit push origin \"$BRANCH\"\nPR_BODY=$(cat suggestions.md 2>/dev/null ||\
+        \ echo \"AI analysis completed.\")\ngh pr create --title \"\U0001F916 AI Suggestions:\
+        \ Post-merge fixes\" --body \"$PR_BODY\" --base main --head \"$BRANCH\"\n"
