@@ -1,174 +1,273 @@
-# Spring PetClinic Sample Application [![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml)[![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml)
+# QR Code Generator - AI-Powered CI/CD Demo
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/spring-projects/spring-petclinic) [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=7517918)
+This project demonstrates **AI-assisted DevOps automation** with a complete CI/CD pipeline that automatically analyzes code and generates infrastructure.
 
-## Understanding the Spring Petclinic application with a few diagrams
+## 🎯 Project Overview
 
-See the presentation here:  
-[Spring Petclinic Sample Application (legacy slides)](https://speakerdeck.com/michaelisvy/spring-petclinic-sample-application?slide=20)
+**QR Code Generator** is a full-stack web application that generates QR codes from various data types:
+- Plain text
+- URLs
+- Email addresses  
+- Phone numbers
+- WiFi credentials
 
-> **Note:** These slides refer to a legacy, pre–Spring Boot version of Petclinic and may not reflect the current Spring Boot–based implementation.  
-> For up-to-date information, please refer to this repository and its documentation.
+### Architecture
 
+- **Frontend**: Unknown (N/A port)
+- **Backend**: Unknown (N/A port)
+- **Infrastructure**: AWS EC2 with Terraform
+- **Deployment**: Docker Compose
+- **CI/CD**: GitHub Actions with AI-generated workflows
 
-## Run Petclinic locally
-
-Spring Petclinic is a [Spring Boot](https://spring.io/guides/gs/spring-boot) application built using [Maven](https://spring.io/guides/gs/maven/) or [Gradle](https://spring.io/guides/gs/gradle/).
-Java 17 or later is required for the build, and the application can run with Java 17 or newer.
-
-You first need to clone the project locally:
-
-```bash
-git clone https://github.com/spring-projects/spring-petclinic.git
-cd spring-petclinic
-```
-If you are using Maven, you can start the application on the command-line as follows:
-
-```bash
-./mvnw spring-boot:run
-```
-With Gradle, the command is as follows:
-
-```bash
-./gradlew bootRun
-```
-
-You can then access the Petclinic at <http://localhost:8080/>.
-
-<img width="1042" alt="petclinic-screenshot" src="https://cloud.githubusercontent.com/assets/838318/19727082/2aee6d6c-9b8e-11e6-81fe-e889a5ddfded.png">
-
-You can, of course, run Petclinic in your favorite IDE.
-See below for more details.
-
-## Building a Container
-
-There is no `Dockerfile` in this project. You can build a container image (if you have a docker daemon) using the Spring Boot build plugin:
-
-```bash
-./mvnw spring-boot:build-image
-```
-
-## In case you find a bug/suggested improvement for Spring Petclinic
-
-Our issue tracker is available [here](https://github.com/spring-projects/spring-petclinic/issues).
-
-## Database configuration
-
-In its default configuration, Petclinic uses an in-memory database (H2) which
-gets populated at startup with data. The h2 console is exposed at `http://localhost:8080/h2-console`,
-and it is possible to inspect the content of the database using the `jdbc:h2:mem:<uuid>` URL. The UUID is printed at startup to the console.
-
-A similar setup is provided for MySQL and PostgreSQL if a persistent database configuration is needed. Note that whenever the database type changes, the app needs to run with a different profile: `spring.profiles.active=mysql` for MySQL or `spring.profiles.active=postgres` for PostgreSQL. See the [Spring Boot documentation](https://docs.spring.io/spring-boot/how-to/properties-and-configuration.html#howto.properties-and-configuration.set-active-spring-profiles) for more detail on how to set the active profile.
-
-You can start MySQL or PostgreSQL locally with whatever installer works for your OS or use docker:
-
-```bash
-docker run -e MYSQL_USER=petclinic -e MYSQL_PASSWORD=petclinic -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=petclinic -p 3306:3306 mysql:9.6
-```
-
-or
-
-```bash
-docker run -e POSTGRES_USER=petclinic -e POSTGRES_PASSWORD=petclinic -e POSTGRES_DB=petclinic -p 5432:5432 postgres:18.3
-```
-
-Further documentation is provided for [MySQL](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources/db/mysql/petclinic_db_setup_mysql.txt)
-and [PostgreSQL](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources/db/postgres/petclinic_db_setup_postgres.txt).
-
-Instead of vanilla `docker` you can also use the provided `docker-compose.yml` file to start the database containers. Each one has a service named after the Spring profile:
-
-```bash
-docker compose up mysql
-```
-
-or
-
-```bash
-docker compose up postgres
-```
-
-## Test Applications
-
-At development time we recommend you use the test applications set up as `main()` methods in `PetClinicIntegrationTests` (using the default H2 database and also adding Spring Boot Devtools), `MySqlTestApplication` and `PostgresIntegrationTests`. These are set up so that you can run the apps in your IDE to get fast feedback and also run the same classes as integration tests against the respective database. The MySql integration tests use Testcontainers to start the database in a Docker container, and the Postgres tests use Docker Compose to do the same thing.
-
-## Compiling the CSS
-
-There is a `petclinic.css` in `src/main/resources/static/resources/css`. It was generated from the `petclinic.scss` source, combined with the [Bootstrap](https://getbootstrap.com/) library. If you make changes to the `scss`, or upgrade Bootstrap, you will need to re-compile the CSS resources using the Maven profile "css", i.e. `./mvnw package -P css`. There is no build profile for Gradle to compile the CSS.
-
-## Working with Petclinic in your IDE
+## 🚀 Quick Start
 
 ### Prerequisites
 
-The following items should be installed in your system:
+- AWS Account with CLI configured
+- Docker and Docker Compose
+- Terraform >= 1.5.0
+- Python 3.11+
+- Git
 
-- Java 17 or newer (full JDK, not a JRE)
-- [Git command line tool](https://help.github.com/articles/set-up-git)
-- Your preferred IDE
-  - Eclipse with the m2e plugin. Note: when m2e is available, there is a m2 icon in `Help -> About` dialog. If m2e is
-  not there, follow the installation process [here](https://www.eclipse.org/m2e/)
-  - [Spring Tools Suite](https://spring.io/tools) (STS)
-  - [IntelliJ IDEA](https://www.jetbrains.com/idea/)
-  - [VS Code](https://code.visualstudio.com)
+### Local Development
 
-### Steps
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd AISDLC2.0
+   ```
 
-1. On the command line run:
+2. **Run locally with Docker Compose**:
+   ```bash
+   docker-compose up -d
+   ```
 
-    ```bash
-    git clone https://github.com/spring-projects/spring-petclinic.git
-    ```
+3. **Access the application**:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000
+   - API Documentation: http://localhost:8000/docs
 
-1. Inside Eclipse or STS:
+### AWS Deployment
 
-    Open the project via `File -> Import -> Maven -> Existing Maven project`, then select the root directory of the cloned repo.
+1. **Configure AWS credentials**:
+   ```bash
+   aws configure
+   ```
 
-    Then either build on the command line `./mvnw generate-resources` or use the Eclipse launcher (right-click on project and `Run As -> Maven install`) to generate the CSS. Run the application's main method by right-clicking on it and choosing `Run As -> Java Application`.
+2. **Set up Terraform variables**:
+   ```bash
+   cd terraform
+   cp terraform.tfvars.example terraform.tfvars
+   # Edit terraform.tfvars with your preferences
+   ```
 
-1. Inside IntelliJ IDEA:
+3. **Deploy to AWS**:
+   ```bash
+   terraform init
+   terraform plan
+   terraform apply
+   ```
 
-    In the main menu, choose `File -> Open` and select the Petclinic [pom.xml](pom.xml). Click on the `Open` button.
+4. **Get deployment URLs**:
+   ```bash
+   terraform output application_urls
+   ```
 
-    - CSS files are generated from the Maven build. You can build them on the command line `./mvnw generate-resources` or right-click on the `spring-petclinic` project then `Maven -> Generates sources and Update Folders`.
+## 🤖 AI DevOps & Security Agent
 
-    - A run configuration named `PetClinicApplication` should have been created for you if you're using a recent Ultimate version. Otherwise, run the application by right-clicking on the `PetClinicApplication` main class and choosing `Run 'PetClinicApplication'`.
+The `ai_devops_agent.py` script automatically:
 
-1. Navigate to the Petclinic
+### Code Analysis
+- Detects programming languages and frameworks
+- Identifies dependencies and test commands
+- Analyzes port configurations
+- **Scans for security vulnerabilities**
+- **Checks best practices compliance**
+- Suggests optimal CI/CD strategies
 
-    Visit [http://localhost:8080](http://localhost:8080) in your browser.
+### Infrastructure Generation
+- Creates Terraform configurations for AWS EC2
+- Generates Docker and Docker Compose files
+- Sets up security groups and networking
+- Configures auto-scaling and monitoring
 
-## Looking for something in particular?
+### Pipeline Automation  
+- Generates GitHub Actions workflows
+- Sets up automated testing and linting
+- Configures deployment strategies
+- Implements rollback mechanisms
 
-|Spring Boot Configuration | Class or Java property files  |
-|--------------------------|---|
-|The Main Class | [PetClinicApplication](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/java/org/springframework/samples/petclinic/PetClinicApplication.java) |
-|Properties Files | [application.properties](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources) |
-|Caching | [CacheConfiguration](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/java/org/springframework/samples/petclinic/system/CacheConfiguration.java) |
+### Usage
 
-## Interesting Spring Petclinic branches and forks
+```bash
+# Run the AI DevOps Agent
+python ai_devops_agent.py
 
-The Spring Petclinic "main" branch in the [spring-projects](https://github.com/spring-projects/spring-petclinic)
-GitHub org is the "canonical" implementation based on Spring Boot and Thymeleaf. There are
-[quite a few forks](https://spring-petclinic.github.io/docs/forks.html) in the GitHub org
-[spring-petclinic](https://github.com/spring-petclinic). If you are interested in using a different technology stack to implement the Pet Clinic, please join the community there.
+# Run with auto-commit (for CI/CD)
+python ai_devops_agent.py --auto-commit
 
-## Interaction with other open-source projects
+# Analyze only (no file generation)
+python ai_devops_agent.py --analyze-only
+```
 
-One of the best parts about working on the Spring Petclinic application is that we have the opportunity to work in direct contact with many Open Source projects. We found bugs/suggested improvements on various topics such as Spring, Spring Data, Bean Validation and even Eclipse! In many cases, they've been fixed/implemented in just a few days.
-Here is a list of them:
+## 📁 Project Structure
 
-| Name | Issue |
-|------|-------|
-| Spring JDBC: simplify usage of NamedParameterJdbcTemplate | [SPR-10256](https://github.com/spring-projects/spring-framework/issues/14889) and [SPR-10257](https://github.com/spring-projects/spring-framework/issues/14890) |
-| Bean Validation / Hibernate Validator: simplify Maven dependencies and backward compatibility |[HV-790](https://hibernate.atlassian.net/browse/HV-790) and [HV-792](https://hibernate.atlassian.net/browse/HV-792) |
-| Spring Data: provide more flexibility when working with JPQL queries | [DATAJPA-292](https://github.com/spring-projects/spring-data-jpa/issues/704) |
+```
+.
+├── README.md                          # This file
+├── VERSION                            # Version tracking
+├── pipeline_request.txt              # AI pipeline configuration
+├── ai_devops_agent.py               # AI DevOps & security agent
+├── docker-compose.yml               # Local development setup
+├── frontend/                        # Frontend application
+│   ├── index.html                  # Main HTML file
+│   ├── script.js                   # JavaScript logic
+│   ├── style.css                   # Styling
+│   ├── Dockerfile                  # Frontend container
+│   └── nginx.conf                  # Nginx configuration
+├── backend/                         # Backend API
+│   ├── main.py                     # FastAPI application
+│   ├── requirements.txt            # Python dependencies
+│   ├── Dockerfile                  # Backend container
+│   └── api/                        # API modules
+├── terraform/                       # Infrastructure as Code
+│   ├── main.tf                     # Main Terraform configuration
+│   ├── variables.tf                # Variable definitions
+│   ├── user_data.sh               # EC2 initialization script
+│   └── terraform.tfvars.example   # Example configuration
+└── .github/workflows/              # CI/CD pipelines
+    ├── ci-cd.yml                   # Main deployment workflow
+    └── ai-generate-workflow.yml    # AI generator trigger
+```
 
-## Contributing
+## 🔄 CI/CD Workflow
 
-The [issue tracker](https://github.com/spring-projects/spring-petclinic/issues) is the preferred channel for bug reports, feature requests and submitting pull requests.
+The AI-generated pipeline includes:
 
-For pull requests, editor preferences are available in the [editor config](.editorconfig) for easy use in common text editors. Read more and download plugins at <https://editorconfig.org>. All commits must include a __Signed-off-by__ trailer at the end of each commit message to indicate that the contributor agrees to the Developer Certificate of Origin.
-For additional details, please refer to the blog post [Hello DCO, Goodbye CLA: Simplifying Contributions to Spring](https://spring.io/blog/2025/01/06/hello-dco-goodbye-cla-simplifying-contributions-to-spring).
+### 1. **Validation Stage**
+- YAML syntax validation
+- Terraform formatting and validation  
+- Code linting and security scanning
 
-## License
+### 2. **Testing Stage**
+- Backend API testing with pytest
+- Frontend testing (if configured)
+- Integration testing
+- Security vulnerability scanning
 
-The Spring PetClinic sample application is released under version 2.0 of the [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
+### 3. **Deployment Stage**
+- Terraform infrastructure provisioning
+- Docker image building and pushing
+- AWS EC2 deployment via user data script
+- Health checks and monitoring setup
+
+### 4. **Notification Stage**
+- Email notifications on success/failure
+- Slack/Teams integration (configurable)
+- Deployment status reporting
+
+## ⚙️ Configuration
+
+### Pipeline Configuration (`pipeline_request.txt`)
+
+```yaml
+pipeline_name: qr-generator-auto-pipeline
+environment: production
+target: aws_ec2
+instance_type: t2.micro
+deploy_using: docker-compose
+labels: [ai-generated, demo]
+email_notification: true
+email_recipient: your-email@example.com
+```
+
+### GitHub Secrets Required
+
+- `AWS_ACCESS_KEY_ID`: AWS access key
+- `AWS_SECRET_ACCESS_KEY`: AWS secret key
+- `EMAIL_USERNAME`: SMTP username (optional)
+- `EMAIL_PASSWORD`: SMTP password (optional)
+
+## 🛡️ Security Features
+
+- EC2 security groups with minimal required ports
+- Encrypted EBS volumes
+- IAM roles with least privilege
+- Container security scanning
+- Secrets management via GitHub Secrets
+
+## 📊 Monitoring & Logging
+
+- CloudWatch monitoring for EC2 instances
+- Application health checks
+- Docker container logs
+- Terraform state management
+- Automated backup and recovery
+
+## 🧹 Cleanup
+
+To destroy the AWS infrastructure:
+
+```bash
+cd terraform
+terraform destroy
+```
+
+To stop local development:
+
+```bash
+docker-compose down -v
+```
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+1. **AWS Permissions**: Ensure your AWS user has EC2, VPC, and IAM permissions
+2. **Terraform State**: Use remote state storage for team collaboration
+3. **Docker Build**: Check Dockerfile syntax and dependency availability
+4. **Port Conflicts**: Ensure ports 3000, 8000, 80 are available
+
+### Debug Commands
+
+```bash
+# Check application logs
+docker-compose logs -f
+
+# SSH into EC2 instance
+ssh -i qr-generator-private-key.pem ubuntu@<instance-ip>
+
+# Check Terraform state
+terraform show
+
+# Validate Terraform configuration
+terraform validate
+```
+
+## 🤝 Contributing
+
+This is a demo project showcasing AI-assisted DevOps. Contributions are welcome:
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- **FastAPI**: Modern Python web framework
+- **Terraform**: Infrastructure as Code
+- **GitHub Actions**: CI/CD automation
+- **AWS**: Cloud infrastructure
+- **Docker**: Containerization platform
+
+---
+
+**Generated by**: AI DevOps Agent v1.0
+**Last Updated**: 2026-03-24 10:03:45
+**Project Version**: 0.1.0
