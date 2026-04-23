@@ -1,20 +1,11 @@
-pipeline_name: spring-petclinic-auto-pipeline
-environment: production
+# Optional. If omitted, the agent uses built-in defaults.
+pipeline_name: example-service-ai-pipeline
 target: aws_ec2
-instance_type: t2.micro
-ami: latest-ubuntu
-deploy_using: spring-boot
-labels: [ai-generated, demo, spring-boot, petclinic]
-email_notification: true
-email_recipient: demo@example.com
-version_file: pom.xml
-frontend_port: 8080
-backend_port: 8080
-frontend_framework: thymeleaf
-backend_framework: spring-boot
-test_command_frontend: ./mvnw test
-test_command_backend: ./mvnw test
-lint_command_frontend: ./mvnw checkstyle:check
-lint_command_backend: ./mvnw checkstyle:check
-build_command_frontend: ./mvnw clean package
-build_command_backend: ./mvnw clean package
+
+# Optional overrides
+environment: production
+instance_type: t3.micro
+
+# Optional when the app supports multiple databases.
+# Supported examples: mysql, postgres
+database_engine: postgres
