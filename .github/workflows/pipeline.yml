@@ -1,0 +1,43 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Validate server-rendered frontend assets
+        run: |
+          test -d src/main/resources/templates
+          test -d src/main/resources/static || true
+      - name: Test backend
+        working-directory: .
+        run: |
+          chmod +x mvnw gradlew 2>/dev/null || true
+          ./mvnw test
+      - name: Repository summary
+        run: |
+          echo "Frontend: server-rendered-html"
+          echo "Backend: spring-boot"
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deployment placeholder
+        run: echo "Deploy to aws_ec2 here"
