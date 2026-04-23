@@ -4,54 +4,62 @@
 
 <body>
 
-  <h2 th:text="#{vets}">Veterinarians</h2>
+  <section class="page-intro">
+    <div>
+      <span class="section-kicker">Clinic staffing</span>
+      <h1 th:text="#{vets}">Veterinarians</h1>
+      <p class="section-lead">A clearer roster view for showing clinic capability and specialties at a glance.</p>
+    </div>
+    <div class="page-badge">
+      <span th:text="${#lists.size(listVets)}">0</span>
+      vets on this page
+    </div>
+  </section>
 
-  <table id="vets" class="table table-striped">
-    <thead>
-      <tr>
-        <th th:text="#{name}">Name</th>
-        <th th:text="#{specialties}">Specialties</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr th:each="vet : ${listVets}">
-        <td th:text="${vet.firstName + ' ' + vet.lastName}"></td>
-        <td>
-          <span th:each="specialty : ${vet.specialties}" th:text="${specialty.name + ' '}" /> <span
-            th:if="${vet.nrOfSpecialties == 0}" th:text="#{none}">none</span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <div th:if="${totalPages > 1}">
-    <span th:text="#{pages}">Pages:</span>
-    <span>[</span>
-    <span th:each="i: ${#numbers.sequence(1, totalPages)}">
-      <a th:if="${currentPage != i}" th:href="@{'/vets.html?page=__${i}__'}">[[${i}]]</a>
-      <span th:unless="${currentPage != i}">[[${i}]]</span>
-    </span>
-    <span>]&nbsp;</span>
-    <span>
-      <a th:if="${currentPage > 1}" th:href="@{'/vets.html?page=1'}" th:title="#{first}"
-        class="fa fa-fast-backward"></a>
-      <span th:unless="${currentPage > 1}" th:title="#{first}" class="fa fa-fast-backward"></span>
-    </span>
-    <span>
-      <a th:if="${currentPage > 1}" th:href="@{'/vets.html?page=__${currentPage - 1}__'}" th:title="#{previous}"
-        class="fa fa-step-backward"></a>
-      <span th:unless="${currentPage > 1}" th:title="#{previous}" class="fa fa-step-backward"></span>
-    </span>
-    <span>
-      <a th:if="${currentPage < totalPages}" th:href="@{'/vets.html?page=__${currentPage + 1}__'}" th:title="#{next}"
-        class="fa fa-step-forward"></a>
-      <span th:unless="${currentPage < totalPages}" th:title="#{next}" class="fa fa-step-forward"></span>
-    </span>
-    <span>
-      <a th:if="${currentPage < totalPages}" th:href="@{'/vets.html?page=__${totalPages}__'}" th:title="#{last}"
-        class="fa fa-fast-forward"></a>
-      <span th:unless="${currentPage < totalPages}" th:title="#{last}" class="fa fa-fast-forward"></span>
-    </span>
-  </div>
+  <section class="panel-card table-card">
+    <div class="table-responsive">
+      <table id="vets" class="table app-table">
+        <thead>
+          <tr>
+            <th th:text="#{name}">Name</th>
+            <th th:text="#{specialties}">Specialties</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="vet : ${listVets}">
+            <td th:text="${vet.firstName + ' ' + vet.lastName}">Vet Name</td>
+            <td>
+              <div class="tag-list" th:if="${vet.nrOfSpecialties > 0}">
+                <span class="tag" th:each="specialty : ${vet.specialties}" th:text="${specialty.name}">radiology</span>
+              </div>
+              <span class="muted-copy" th:if="${vet.nrOfSpecialties == 0}" th:text="#{none}">none</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <nav class="pager-nav" th:if="${totalPages > 1}">
+    <span class="pager-summary">Page [[${currentPage}]] of [[${totalPages}]]</span>
+    <div class="pager-links">
+      <a class="pager-link" th:if="${currentPage > 1}" th:href="@{'/vets.html?page=1'}" th:text="#{first}">First</a>
+      <span class="pager-link is-disabled" th:unless="${currentPage > 1}" th:text="#{first}">First</span>
+      <a class="pager-link" th:if="${currentPage > 1}" th:href="@{'/vets.html?page=__${currentPage - 1}__'}"
+        th:text="#{previous}">Previous</a>
+      <span class="pager-link is-disabled" th:unless="${currentPage > 1}" th:text="#{previous}">Previous</span>
+      <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+        <a class="pager-link" th:if="${currentPage != i}" th:href="@{'/vets.html?page=__${i}__'}">[[${i}]]</a>
+        <span class="pager-link is-current" th:unless="${currentPage != i}">[[${i}]]</span>
+      </span>
+      <a class="pager-link" th:if="${currentPage &lt; totalPages}" th:href="@{'/vets.html?page=__${currentPage + 1}__'}"
+        th:text="#{next}">Next</a>
+      <span class="pager-link is-disabled" th:unless="${currentPage &lt; totalPages}" th:text="#{next}">Next</span>
+      <a class="pager-link" th:if="${currentPage &lt; totalPages}" th:href="@{'/vets.html?page=__${totalPages}__'}"
+        th:text="#{last}">Last</a>
+      <span class="pager-link is-disabled" th:unless="${currentPage &lt; totalPages}" th:text="#{last}">Last</span>
+    </div>
+  </nav>
 </body>
 
 </html>
