@@ -5,18 +5,8 @@ on:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
     inputs:
-      mode:
-        description: Agent execution mode
-        required: true
-        default: suggest-changes
-        type: choice
-        options:
-          - analyze-only
-          - suggest-changes
-          - generate
-          - generate-and-commit
       create_pull_request:
-        description: Create a pull request when generate mode creates files
+        description: Create a pull request when generated files change
         required: true
         default: false
         type: boolean
@@ -37,8 +27,7 @@ env:
   AGENT_PATH: .github/tools/devops-agent-source/ai_devops_agent.py
 
 jobs:
-  analyze-and-comment:
-    if: github.event_name == 'pull_request'
+  run-ai-devops-agent:
     runs-on: ubuntu-latest
 
     steps:
@@ -57,102 +46,63 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Run AI analysis
+      - name: Install agent dependencies
         run: |
-          python "$AGENT_PATH" \
-            --project-root . \
-            --config-file pipeline_request.txt \
-            --mode analyze-only \
-            --verbose \
-            > ai-devops-agent-output.txt
+          python -m pip install --upgrade pip
+          python -m pip install -r "$AGENT_REPO_PATH/requirements.txt"
 
-      - name: Generate suggestions report
+      - name: Run AI DevOps Agent
+        env:
+          OPENAI_API_TOKEN: ${{ secrets.OPENAI_API_TOKEN }}
         run: |
           python "$AGENT_PATH" \
             --project-root . \
             --config-file pipeline_request.txt \
-            --mode suggest-changes \
-            > suggestions-output.txt
+            --mode ai \
+            > ai-devops-agent-output.txt 2>&1
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ai-devops-agent-pr-${{ github.run_id }}
+          name: ai-devops-agent-${{ github.run_id }}
           if-no-files-found: ignore
           path: |
             ai-devops-agent-output.txt
-            suggestions-output.txt
-            SUGGESTIONS.md
+            AI_DEVOPS_REPORT.md
+            README_GENERATED.md
+            .github/workflows/pipeline.yml
+            terraform/**
+            docker-compose.yml
 
       - name: Comment on pull request
-        if: always()
+        if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
-            const summary = fs.existsSync('SUGGESTIONS.md')
-              ? fs.readFileSync('SUGGESTIONS.md', 'utf8').slice(0, 60000)
-              : 'AI DevOps Agent completed, but no suggestions report was generated.';
+            const body = fs.existsSync('AI_DEVOPS_REPORT.md')
+              ? fs.readFileSync('AI_DEVOPS_REPORT.md', 'utf8').slice(0, 60000)
+              : 'AI DevOps Agent completed, but no AI_DEVOPS_REPORT.md was generated.';
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: summary
+              body
             });
 
-  manual-run:
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Checkout AI DevOps Agent source
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.DEVOPS_AGENT_SOURCE_REPO }}
-          ref: ${{ env.DEVOPS_AGENT_REF }}
-          path: ${{ env.AGENT_REPO_PATH }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Run selected mode
-        run: |
-          python "$AGENT_PATH" \
-            --project-root . \
-            --config-file pipeline_request.txt \
-            --mode "${{ inputs.mode }}" \
-            > ai-devops-agent-output.txt
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ai-devops-agent-manual-${{ github.run_id }}
-          if-no-files-found: ignore
-          path: |
-            ai-devops-agent-output.txt
-            SUGGESTIONS.md
-            README_GENERATED.md
-            .github/generated/**
-            .github/workflows/pipeline.yml
-
       - name: Create pull request with generated changes
-        if: inputs.mode == 'generate' && inputs.create_pull_request
+        if: github.event_name == 'workflow_dispatch' && inputs.create_pull_request
         uses: peter-evans/create-pull-request@v7
         with:
           branch: chore/ai-devops-agent-${{ github.run_id }}
           commit-message: 'chore: apply AI DevOps agent outputs'
           title: 'chore: apply AI DevOps agent outputs'
           body: |
-            This pull request was created by the AI DevOps Agent demo workflow.
+            This pull request was created by the AI DevOps Agent workflow.
 
-            - Mode: `${{ inputs.mode }}`
+            - Mode: `ai`
             - Source: `${{ env.DEVOPS_AGENT_SOURCE_REPO }}@${{ env.DEVOPS_AGENT_REF }}`
 
-            Review generated workflows, Terraform, Dockerfiles, and README changes before merge.
+            Review the AI report, generated workflow, Terraform, Docker Compose, and README output before merge.
