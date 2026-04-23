@@ -14,7 +14,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  workflows: write
 
 concurrency:
   group: ai-devops-agent-${{ github.workflow }}-${{ github.ref }}
@@ -105,6 +104,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && inputs.create_pull_request
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.PAT_TOKEN }}
           branch: chore/ai-devops-agent-${{ github.run_id }}
           commit-message: 'chore: apply AI DevOps agent outputs'
           title: 'chore: apply AI DevOps agent outputs'
@@ -126,6 +126,7 @@ jobs:
         if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.PAT_TOKEN }}
           branch: chore/ai-devops-follow-up-${{ github.run_id }}
           commit-message: 'chore: apply AI DevOps follow-up changes'
           title: 'chore: AI DevOps follow-up suggestions'
