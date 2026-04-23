@@ -4,31 +4,41 @@
 
 <body>
 
-  <h2 th:text="#{findOwners}">Find Owners</h2>
-
-  <form th:object="${owner}" th:action="@{/owners}" method="get" class="form-horizontal" id="search-owner-form">
-    <div class="form-group">
-      <div class="control-group" id="lastNameGroup">
-        <label class="col-sm-2 control-label" th:text="#{lastName}">Last name </label>
-        <div class="col-sm-10">
-          <input class="form-control" th:field="*{lastName}" size="30" maxlength="80" />
-          <span class="help-inline">
-            <div th:if="${#fields.hasAnyErrors()}">
-              <p th:each="err : ${#fields.allErrors()}" th:text="${err}">Error</p>
-            </div>
-          </span>
-        </div>
-      </div>
+  <section class="page-intro">
+    <div>
+      <span class="section-kicker">Owner workflow</span>
+      <h1 th:text="#{findOwners}">Find Owners</h1>
+      <p class="section-lead">Search by last name during the demo, or create a new owner profile on the spot.</p>
     </div>
-    <div class="form-group">
-      <div class="col-sm-offset-2 col-sm-10">
+    <a class="btn btn-secondary" th:href="@{/owners/new}" th:text="#{addOwner}">Add Owner</a>
+  </section>
+
+  <section class="panel-card search-panel">
+    <form th:object="${owner}" th:action="@{/owners}" method="get" class="app-search-form" id="search-owner-form">
+      <label class="form-label search-label" th:for="lastName" th:text="#{lastName}">Last name</label>
+      <div class="search-input-row">
+        <input class="form-control form-control-lg" th:field="*{lastName}" size="30" maxlength="80"
+          placeholder="Enter a family name" />
         <button type="submit" class="btn btn-primary" th:text="#{findOwner}">Find Owner</button>
       </div>
+      <div class="form-error-list" th:if="${#fields.hasAnyErrors()}">
+        <p th:each="err : ${#fields.allErrors()}" th:text="${err}">Error</p>
+      </div>
+    </form>
+
+    <div class="quick-link-grid">
+      <a class="quick-link-card" th:href="@{/}">
+        <span class="fa fa-home quick-link-icon" aria-hidden="true"></span>
+        <span class="quick-link-title" th:text="#{home}">Home</span>
+        <span class="quick-link-copy">Return to the main demo overview.</span>
+      </a>
+      <a class="quick-link-card" th:href="@{/vets.html}">
+        <span class="fa fa-user-md quick-link-icon" aria-hidden="true"></span>
+        <span class="quick-link-title" th:text="#{vets}">Veterinarians</span>
+        <span class="quick-link-copy">Switch to the clinic staffing view.</span>
+      </a>
     </div>
-
-    <a class="btn btn-primary" th:href="@{/owners/new}" th:text="#{addOwner}">Add Owner</a>
-
-  </form>
+  </section>
 
 </body>
 

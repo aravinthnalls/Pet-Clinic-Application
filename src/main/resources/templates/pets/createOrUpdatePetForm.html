@@ -4,30 +4,36 @@
 
 <body>
 
-  <h2>
-    <th:block th:if="${pet['new']}" th:text="#{new}">New </th:block>
-    <span th:text="#{pet}">Pet</span>
-  </h2>
-  <form th:object="${pet}" class="form-horizontal" method="post">
-    <input type="hidden" name="id" th:value="*{id}" />
-    <div class="form-group has-feedback">
-      <div class="form-group">
-        <label class="col-sm-2 control-label" th:text="#{owner}">Owner</label>
-        <div class="col-sm-10">
-          <span th:text="${owner?.firstName + ' ' + owner?.lastName}" />
-        </div>
-      </div>
-      <input th:replace="~{fragments/inputField :: input ('Name', 'name', 'text')}" />
-      <input th:replace="~{fragments/inputField :: input ('Birth Date', 'birthDate', 'date')}" />
-      <input th:replace="~{fragments/selectField :: select ('Type', 'type', ${types})}" />
+  <section class="page-intro">
+    <div>
+      <span class="section-kicker">Pet profile</span>
+      <h1>
+        <th:block th:if="${pet['new']}">Add new pet</th:block>
+        <th:block th:unless="${pet['new']}">Update pet</th:block>
+      </h1>
+      <p class="section-lead">Attach a pet to its owner and keep the clinic record ready for future visits.</p>
     </div>
-    <div class="form-group">
-      <div class="col-sm-offset-2 col-sm-10">
+  </section>
+
+  <section class="panel-card form-panel">
+    <div class="owner-highlight">
+      <span class="detail-label" th:text="#{owner}">Owner</span>
+      <strong th:text="${owner?.firstName + ' ' + owner?.lastName}">Owner Name</strong>
+    </div>
+    <form th:object="${pet}" class="app-form" method="post">
+      <input type="hidden" name="id" th:value="*{id}" />
+      <div class="app-form-fields">
+        <input th:replace="~{fragments/inputField :: input ('Name', 'name', 'text')}" />
+        <input th:replace="~{fragments/inputField :: input ('Birth Date', 'birthDate', 'date')}" />
+        <input th:replace="~{fragments/selectField :: select ('Type', 'type', ${types})}" />
+      </div>
+      <div class="form-actions">
         <button th:with="text=${pet['new']} ? 'Add Pet' : 'Update Pet'" class="btn btn-primary" type="submit"
           th:text="${text}">Add Pet</button>
+        <a class="btn btn-secondary" th:href="@{/owners/__${owner.id}__}">Back to owner</a>
       </div>
-    </div>
-  </form>
+    </form>
+  </section>
 
 </body>
 

@@ -4,90 +4,124 @@
 
 <body>
 
-  <h2 th:text="#{ownerInformation}">Owner Information</h2>
+  <section class="page-intro page-intro--stacked">
+    <div>
+      <span class="section-kicker">Owner profile</span>
+      <h1 th:text="${owner.firstName + ' ' + owner.lastName}">Owner Name</h1>
+      <p class="section-lead">Everything you need for the walkthrough, from contact details to pet history and visits.</p>
+    </div>
+    <div class="action-row">
+      <a th:href="@{__${owner.id}__/edit}" class="btn btn-secondary" th:text="#{editOwner}">Edit Owner</a>
+      <a th:href="@{__${owner.id}__/pets/new}" class="btn btn-primary" th:text="#{addNewPet}">Add New Pet</a>
+    </div>
+  </section>
 
-  <div th:if="${message}" class="alert alert-success" id="success-message">
+  <div th:if="${message}" class="alert alert-success auto-dismiss-alert" id="success-message">
     <span th:text="${message}"></span>
   </div>
 
-  <div th:if="${error}" class="alert alert-danger" id="error-message">
+  <div th:if="${error}" class="alert alert-danger auto-dismiss-alert" id="error-message">
     <span th:text="${error}"></span>
   </div>
 
-  <table class="table table-striped" th:object="${owner}">
-    <tr>
-      <th th:text="#{name}">Name</th>
-      <td><b th:text="*{firstName + ' ' + lastName}"></b></td>
-    </tr>
-    <tr>
-      <th th:text="#{address}">Address</th>
-      <td th:text="*{address}"></td>
-    </tr>
-    <tr>
-      <th th:text="#{city}">City</th>
-      <td th:text="*{city}"></td>
-    </tr>
-    <tr>
-      <th th:text="#{telephone}">Telephone</th>
-      <td th:text="*{telephone}"></td>
-    </tr>
-  </table>
+  <div class="stat-strip">
+    <div class="stat-chip">
+      <span class="stat-label">City</span>
+      <strong th:text="${owner.city}">Madison</strong>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-label" th:text="#{pets}">Pets</span>
+      <strong th:text="${owner.pets.size()}">0</strong>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-label" th:text="#{telephone}">Telephone</span>
+      <strong th:text="${owner.telephone}">6085551023</strong>
+    </div>
+  </div>
 
-  <a th:href="@{__${owner.id}__/edit}" class="btn btn-primary" th:text="#{editOwner}">Edit
-    Owner</a>
-  <a th:href="@{__${owner.id}__/pets/new}" class="btn btn-primary" th:text="#{addNewPet}">Add
-    New Pet</a>
+  <section class="panel-card detail-card" th:object="${owner}">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">Profile details</span>
+        <h2 th:text="#{ownerInformation}">Owner Information</h2>
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label" th:text="#{name}">Name</span>
+        <strong th:text="*{firstName + ' ' + lastName}">Owner Name</strong>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label" th:text="#{address}">Address</span>
+        <strong th:text="*{address}">Address</strong>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label" th:text="#{city}">City</span>
+        <strong th:text="*{city}">City</strong>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label" th:text="#{telephone}">Telephone</span>
+        <strong th:text="*{telephone}">Telephone</strong>
+      </div>
+    </div>
+  </section>
 
-  <br />
-  <br />
-  <br />
-  <h2 th:text="#{petsAndVisits}">Pets and Visits</h2>
+  <section class="section-block">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">Care history</span>
+        <h2 th:text="#{petsAndVisits}">Pets and Visits</h2>
+      </div>
+    </div>
 
-  <table class="table table-striped">
+    <div class="pet-card-grid" th:if="${!owner.pets.isEmpty()}">
+      <article class="panel-card pet-card" th:each="pet : ${owner.pets}">
+        <div class="pet-card-header">
+          <div>
+            <h3 th:text="${pet.name}">Pet Name</h3>
+            <div class="pet-meta">
+              <span class="tag" th:text="${pet.type}">cat</span>
+              <span class="muted-copy">
+                Born <span th:text="${#temporals.format(pet.birthDate, 'yyyy-MM-dd')}">2024-01-01</span>
+              </span>
+            </div>
+          </div>
+          <div class="action-row action-row--compact">
+            <a class="btn btn-secondary btn-sm" th:href="@{__${owner.id}__/pets/__${pet.id}__/edit}"
+              th:text="#{editPet}">Edit Pet</a>
+            <a class="btn btn-primary btn-sm" th:href="@{__${owner.id}__/pets/__${pet.id}__/visits/new}"
+              th:text="#{addVisit}">Add Visit</a>
+          </div>
+        </div>
 
-    <tr th:each="pet : ${owner.pets}">
-      <td valign="top">
-        <dl class="dl-horizontal">
-          <dt th:text="#{name}">Name</dt>
-          <dd th:text="${pet.name}"></dd>
-          <dt th:text="#{birthDate}">Birth Date</dt>
-          <dd th:text="${#temporals.format(pet.birthDate, 'yyyy-MM-dd')}"></dd>
-          <dt th:text="#{type}">Type</dt>
-          <dd th:text="${pet.type}"></dd>
-        </dl>
-      </td>
-      <td valign="top">
-        <table class="table-condensed">
-          <thead>
-            <tr>
-              <th th:text="#{visitDate}">Visit Date</th>
-              <th th:text="#{description}">Description</th>
-            </tr>
-          </thead>
-          <tr th:each="visit : ${pet.visits}">
-            <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
-            <td th:text="${visit?.description}"></td>
-          </tr>
-          <tr>
-            <td><a th:href="@{__${owner.id}__/pets/__${pet.id}__/edit}" th:text="#{editPet}">Edit Pet</a></td>
-            <td><a th:href="@{__${owner.id}__/pets/__${pet.id}__/visits/new}" th:text="#{addVisit}">Add Visit</a></td>
-          </tr>
-        </table>
-      </td>
-    </tr>
+        <div class="visit-stream" th:if="${!pet.visits.isEmpty()}">
+          <div class="visit-row" th:each="visit : ${pet.visits}">
+            <span class="visit-date" th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}">2024-01-01</span>
+            <span class="visit-description" th:text="${visit.description}">Description</span>
+          </div>
+        </div>
+        <p class="empty-copy" th:if="${pet.visits.isEmpty()}">No visits recorded yet.</p>
+      </article>
+    </div>
 
-  </table>
+    <div class="panel-card empty-state" th:if="${owner.pets.isEmpty()}">
+      <h3>No pets registered yet</h3>
+      <p>Create a pet profile to start building visit history for this owner.</p>
+    </div>
+  </section>
   <script>
-    // Function to hide the success and error messages after 3 seconds
     function hideMessages() {
+      var messages = document.querySelectorAll(".auto-dismiss-alert");
       setTimeout(function () {
-        document.getElementById("success-message").style.display = "none";
-        document.getElementById("error-message").style.display = "none";
-      }, 3000); // 3000 milliseconds (3 seconds)
+        messages.forEach(function(message) {
+          message.style.display = "none";
+        });
+      }, 3000);
     }
 
-    // Call the function to hide messages
-    hideMessages();
+    if (document.querySelector(".auto-dismiss-alert")) {
+      hideMessages();
+    }
   </script>
 
 </body>

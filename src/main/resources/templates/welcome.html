@@ -4,12 +4,69 @@
 
 <body>
 
-  <h2 th:text="#{welcome}">Welcome</h2>
-  <div class="row">
-    <div class="col-md-12">
-      <img class="img-responsive" src="../static/resources/images/pets.png" th:src="@{/resources/images/pets.png}" />
+  <section class="hero-section">
+    <div class="hero-copy">
+      <span class="section-kicker" th:text="#{welcome}">Welcome</span>
+      <h1>Show a classic app with a sharper meetup-stage experience.</h1>
+      <p class="hero-lead">
+        This refreshed PetClinic front end makes the story easy to tell live: find an owner, inspect pet history,
+        capture visits, and review veterinarian specialties without the interface getting in the way.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg" th:href="@{/owners/find}">Start with owners</a>
+        <a class="btn btn-secondary btn-lg" th:href="@{/vets.html}">Meet the care team</a>
+      </div>
+      <div class="hero-metrics">
+        <article class="metric-card">
+          <span class="metric-label">Flow 1</span>
+          <h2>Owner lookup</h2>
+          <p>Jump from search to a full relationship view in a couple of clicks.</p>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">Flow 2</span>
+          <h2>Pet timelines</h2>
+          <p>Show visits, birth dates, and next actions in one place.</p>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">Flow 3</span>
+          <h2>Vet coverage</h2>
+          <p>Surface specialties quickly when you want a broader clinic view.</p>
+        </article>
+      </div>
     </div>
-  </div>
+    <div class="hero-visual">
+      <div class="hero-image-frame">
+        <div class="hero-chip hero-chip--top">
+          <span class="fa fa-search" aria-hidden="true"></span>
+          Guided owner search
+        </div>
+        <img class="hero-image" src="../static/resources/images/pets.png" th:src="@{/resources/images/pets.png}"
+          alt="Pets in the PetClinic application" />
+        <div class="hero-chip hero-chip--bottom">
+          <span class="fa fa-stethoscope" aria-hidden="true"></span>
+          Better detail views and forms
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="showcase-grid">
+    <article class="panel-card showcase-card">
+      <span class="fa fa-id-card-o showcase-icon" aria-hidden="true"></span>
+      <h2>Owner profiles</h2>
+      <p>Contact details, registered pets, and visit history sit together so the walkthrough feels continuous.</p>
+    </article>
+    <article class="panel-card showcase-card">
+      <span class="fa fa-plus-square showcase-icon" aria-hidden="true"></span>
+      <h2>Fast create flows</h2>
+      <p>Add owners, pets, and visits with cleaner forms that look good on a projector and on mobile.</p>
+    </article>
+    <article class="panel-card showcase-card">
+      <span class="fa fa-users showcase-icon" aria-hidden="true"></span>
+      <h2>Team visibility</h2>
+      <p>Veterinarian specialties are easier to scan, which makes the clinic staffing story easier to narrate.</p>
+    </article>
+  </section>
 
 </body>
 
