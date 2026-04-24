@@ -1,0 +1,70 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Validate server-rendered frontend assets
+        run: |
+          test -d src/main/resources/templates
+          test -d src/main/resources/static || true
+      - name: Test backend
+        working-directory: .
+        run: |
+          chmod +x mvnw gradlew 2>/dev/null || true
+          ./mvnw test
+      - name: Repository summary
+        run: |
+          echo "Frontend: server-rendered-html"
+          echo "Backend: spring-boot"
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    env:
+      CLOUD_DEPLOY_ENABLED: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' && vars.AWS_REGION != '' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        if: env.CLOUD_DEPLOY_ENABLED == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Set up Terraform
+        if: env.CLOUD_DEPLOY_ENABLED == 'true'
+        uses: hashicorp/setup-terraform@v3
+      - name: Terraform apply
+        if: env.CLOUD_DEPLOY_ENABLED == 'true'
+        working-directory: terraform
+        env:
+          TF_VAR_app_image_repository: ghcr.io/${{ github.repository }}
+          TF_VAR_app_image_tag: ${{ github.sha }}
+        run: |
+          terraform init
+          terraform validate
+          terraform plan -out=tfplan
+          terraform apply -auto-approve tfplan
+
+      - name: Skip cloud deployment
+        if: env.CLOUD_DEPLOY_ENABLED != 'true'
+        run: echo "AWS credentials or AWS region are not configured; skipping Terraform apply."
+
