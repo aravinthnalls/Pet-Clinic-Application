@@ -1,75 +1,44 @@
-name: pet-clinic-application
-
+version: '3.9'
 services:
-  petclinic:
-    image: ${APP_IMAGE_REPOSITORY:-avi44/aravinth_apps}:${APP_IMAGE_TAG:-latest}
+  backend:
+    build: ./.
+    ports:
+    - 8080:8080
+    environment:
+      APP_ENV: production
+      DEBUG: 'false'
+      DB_HOST: postgres
+      DB_PORT: '5432'
     restart: unless-stopped
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -fsS http://localhost:8080/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-postgres}
-      POSTGRES_URL: ${POSTGRES_URL:-jdbc:postgresql://postgres:5432/petclinic}
-      POSTGRES_USER: ${POSTGRES_USER:-petclinic}
-      POSTGRES_PASS: ${POSTGRES_PASS:-petclinic}
-      SERVER_PORT: 8080
-    ports:
-      - "${APP_PORT:-8080}:8080"
-    networks:
-      - petclinic
-
-  mysql:
-    image: mysql:9.6
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-petclinic}
-      MYSQL_USER: ${MYSQL_USER:-petclinic}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-petclinic}
-    ports:
-      - "${MYSQL_PORT:-3306}:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD} --silent",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
-    networks:
-      - petclinic
-
   postgres:
-    image: postgres:18.3
+    image: postgres:16
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-petclinic}
-      POSTGRES_USER: ${POSTGRES_USER:-petclinic}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-petclinic}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+    - 5432:5432
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: change-me
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+    - postgres_data:/var/lib/postgresql/data
+    - ./docker/init/postgres:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}",
-        ]
+      - CMD-SHELL
+      - pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 10s
-    networks:
-      - petclinic
-
-networks:
-  petclinic:
-
 volumes:
-  mysql_data:
-  postgres_data:
+  postgres_data: {}
