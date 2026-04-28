@@ -1,0 +1,11 @@
+aws_region = "us-east-1"
+instance_type = "t3.micro"
+environment = "production"
+app_port = 8080
+application_ingress_cidr = "10.0.0.0/16"
+app_image_repository = "avi44/aravinth_apps:tagname"
+app_image_tag = "latest"
+database_engine = "postgres"
+db_name = "appdb"
+db_user = "appuser"
+db_password = "change-me"
